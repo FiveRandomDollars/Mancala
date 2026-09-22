@@ -6,7 +6,7 @@ from unittest import case
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-#Look Upon My Work Ye Mighty And Despair
+#Look Upon My Works Ye Mighty And Despair
 
 #Convenience Functions =========================================================================================
 board = {
