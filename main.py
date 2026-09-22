@@ -1,9 +1,12 @@
 # This is a sample Python script.
+from idlelib import sidebar
+from unittest import case
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
+#Look Upon My Work Ye Mighty And Despair
 
 #Convenience Functions =========================================================================================
 board = {
@@ -20,6 +23,8 @@ board2 = {
 
 store1 = 0;
 store2 = 0;
+turn = True
+endside = False
 
 
 def row(times):
@@ -31,8 +36,8 @@ def quickprint(space, side):
         for i in board1:
             print(board1[i], end=space)
     else:
-        for i in board2:
-            print(board2[i], end=space)
+        for i in range (1, 7):
+            print(board2[14 - i], end=space)
 
 def quickline(start, end, space):
     for i in range(start, end):
@@ -50,6 +55,7 @@ def quicknum(space, rev):
 
 
 
+
 def printboard():
     print("   ", end="")
     quicknum("        ",  False)
@@ -57,12 +63,12 @@ def printboard():
     quickline(1, 55, "")
     print(" ")
     print("B: ", end = "")
-    quickprint("         ", True)
+    quickprint("         ", False)
     row(2)
     print("    " + str(store1) + "                                               " + str(store2))
     row(1)
     print("A: ", end="")
-    quickprint( "         ", False)
+    quickprint( "         ", True)
     row(1)
     quickline(1, 55, "")
     row(1)
@@ -72,7 +78,7 @@ def printboard():
 #Game functions ========================================================================
 
 
-turn = True
+
 
 def pocketcheck(pocket):
     if (pocket > 0 and pocket < 14 and pocket != 7):
@@ -84,7 +90,7 @@ def pocketcheck(pocket):
     else:
         return not turn
 
-turn: bool = True#light up purposes ONLY
+
 
 def isvalidmove(pocket):
     global turn
@@ -111,8 +117,9 @@ def isvalidmove(pocket):
 
 
 def movestone(pocket):
-
+    global store1, store2, turn
     stones = 0
+    last = 0
     match isvalidmove(pocket):
 
         case "valid":
@@ -127,9 +134,25 @@ def movestone(pocket):
 
     spaces = compile(stones, pocket)
     for space in spaces:
-        board[space] += 1
 
+        last = space
+        if space != 100:
+            board[space] += 1
+        else:
+            match turn:
+
+                case True:
+                    store1 += 1
+
+                case False:
+                    store2 += 1
+
+    board[pocket] = 0
     sync()
+    if last != 100:
+        capture(last)
+    if last != 100:
+        turn = not turn
 
 def compile(stones, start):
     numlist = []
@@ -142,15 +165,10 @@ def compile(stones, start):
         match start:
             case 0|7:
                 numlist.append(100)
-                if turn == True and start == 0:
-                    numlist.append(0)
-                if turn == False and start == 7:
-                    numlist.append(7)
 
+            case 1|2|3|4|5|6|8|9|10|11|12|13:
+                numlist.append(start)
 
-
-
-        numlist.append(start)
     return numlist
 
 def sync():
@@ -161,20 +179,106 @@ def sync():
     for i in range(8,14):
         board2[i] = board[i]
 
+def taketurn():
+    move = 0
+    global turn
+
+    match turn:
+        case True:
+            row(2)
+            print("player A's turn")
+            row(1)
+            print("potential moves:", end = " ")
+            for i in range(1,7):
+                if isvalidmove(i) == "valid":
+                    print(i, end = " ")
+
+            row(2)
+            while movestone(move) == "invalid":
+
+                print('Enter your move:', end = '')
+                move = int(input())
 
 
 
+        case False:
+            row(2)
+            print("player B's turn")
+            row(1)
+            print("potential moves:", end=" ")
+            for i in range(8, 14):
+                if isvalidmove(i) == "valid":
+                    print(i, end = " ")
 
+            row(2)
+            while movestone(move) == "invalid":
+                print('Enter your move:', end = '')
+                move = int(input())
 
+def capture(end):
+    global store1
+    global store2
+    match turn:
+        case True:
+            if end in board1 and board1[end] == 1:
+                opposite = 14 - end
+                store1 += board2[opposite] + 1
+                board2[opposite] = 0
+                board1[end] = 0
+        case False:
+            if end in board2 and board2[end] == 1:
+                opposite = 14 - end
+                store2 += board1[opposite] + 1
+                board1[opposite] = 0
+                board2[end] = 0
+
+def wincon():
+    global endside
+    flag = True
+
+    for i in board1:
+        if board1[i] != 0:
+            flag = False
+            break
+
+    if flag == True:
+        engside = True
+
+    else:
+        for i in board2:
+            if board2[i] != 0:
+                flag = False
+                break
+
+    return flag
+
+def end():
+    global store1
+    global store2
+    global endside
+    match endside:
+        case True:
+            for i in board2:
+                store2 += board2[i]
+                board2[i] = 0
+
+        case False:
+            for i in board1:
+                store1 += board1[i]
+                board1[i] = 0
 
 
 
 
 #=======================================================================================
-printboard()
-print(isvalidmove(1))
-movestone(1)
-printboard()
+
+
+while not wincon():
+    printboard()
+    taketurn()
+    row(2)
+end()
+
 
 # Press the green button in the gutter to run the script.
 
