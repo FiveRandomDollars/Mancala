@@ -63,7 +63,7 @@ def printboard():
     print("B: ", end="")
     quickprint("         ", False)
     row(2)
-    print("    " + str(store2) + "                                               " + str(store1))
+    print("" + str(store2) + "                                                      " + str(store1))
     row(1)
     print("A: ", end="")
     quickprint("         ", True)
@@ -218,13 +218,16 @@ def taketurn():
 
             row(2)
             while movestone(move) == "invalid":
-                print('Enter your move:', end='')
-                move = int(input())
+                try:
+                    move = int(input())
+                except ValueError:
+                    print("Enter a valid integer")
 
 
 def capture(end):
     global store1
     global store2
+
     opposite = 14 - end
     match turn:
         case True:
@@ -232,11 +235,15 @@ def capture(end):
                 store1 += board2[opposite] + 1
                 board2[opposite] = 0
                 board1[end] = 0
+                board[opposite] = 0
+                board[end] = 0
         case False:
             if end in board2 and board2[end] == 1 and board1[opposite] > 0:
                 store2 += board1[opposite] + 1
                 board1[opposite] = 0
                 board2[end] = 0
+                board[opposite] = 0
+                board[end] = 0
 
 
 def wincon():
